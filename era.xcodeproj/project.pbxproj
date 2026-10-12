@@ -15,17 +15,17 @@
 
 /* Begin PBXFileReference section */
 		4A3CCDB52D5C94BD00D7C8CE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		4AC596AD2D3C6DC400FF0326 /* Zero.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zero.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4AC596AD2D3C6DC400FF0326 /* era.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = era.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9C85F212E961E3100831B96 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		4AE4E5882D4F54A90083FB2C /* Exceptions for "Browser" folder in "Zero" target */ = {
+		4AE4E5882D4F54A90083FB2C /* Exceptions for "Browser" folder in "era" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 4AC596AC2D3C6DC400FF0326 /* Zero */;
+			target = 4AC596AC2D3C6DC400FF0326 /* era */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -33,7 +33,7 @@
 		4AC596AF2D3C6DC400FF0326 /* Browser */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				4AE4E5882D4F54A90083FB2C /* Exceptions for "Browser" folder in "Zero" target */,
+				4AE4E5882D4F54A90083FB2C /* Exceptions for "Browser" folder in "era" target */,
 			);
 			path = Browser;
 			sourceTree = "<group>";
@@ -74,7 +74,7 @@
 		4AC596AE2D3C6DC400FF0326 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4AC596AD2D3C6DC400FF0326 /* Zero.app */,
+				4AC596AD2D3C6DC400FF0326 /* era.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -82,9 +82,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4AC596AC2D3C6DC400FF0326 /* Zero */ = {
+		4AC596AC2D3C6DC400FF0326 /* era */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4AC596BE2D3C6DC600FF0326 /* Build configuration list for PBXNativeTarget "Zero" */;
+			buildConfigurationList = 4AC596BE2D3C6DC600FF0326 /* Build configuration list for PBXNativeTarget "era" */;
 			buildPhases = (
 				4AC596A92D3C6DC400FF0326 /* Sources */,
 				4AC596AA2D3C6DC400FF0326 /* Frameworks */,
@@ -97,13 +97,13 @@
 			fileSystemSynchronizedGroups = (
 				4AC596AF2D3C6DC400FF0326 /* Browser */,
 			);
-			name = Zero;
+			name = era;
 			packageProductDependencies = (
 				4A62F7192D5349EE0084D3A2 /* SymbolPicker */,
 				4AC77A852D573849005BEF25 /* KeyboardShortcuts */,
 			);
-			productName = Browser;
-			productReference = 4AC596AD2D3C6DC400FF0326 /* Zero.app */;
+			productName = era;
+			productReference = 4AC596AD2D3C6DC400FF0326 /* era.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -122,7 +122,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 4AC596A82D3C6DC400FF0326 /* Build configuration list for PBXProject "Zero" */;
+			buildConfigurationList = 4AC596A82D3C6DC400FF0326 /* Build configuration list for PBXProject "era" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -140,7 +140,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4AC596AC2D3C6DC400FF0326 /* Zero */,
+				4AC596AC2D3C6DC400FF0326 /* era */,
 			);
 		};
 /* End PBXProject section */
@@ -326,13 +326,13 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Browser/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Zero;
+				INFOPLIST_KEY_CFBundleDisplayName = era;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Browser needs access to use your camera in websites.";
-				INFOPLIST_KEY_NSHumanReadableCopyright = sameerasw.com;
-				INFOPLIST_KEY_NSLocationUsageDescription = "Browser needs access to use your location in websites.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Browser needs access to use your location in websites.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Browser needs access to use your microphone on websites.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "era needs access to use your camera in websites.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "ph1ncyn, based on Zero by sameerasw";
+				INFOPLIST_KEY_NSLocationUsageDescription = "era needs access to use your location in websites.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "era needs access to use your location in websites.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "era needs access to use your microphone on websites.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -343,7 +343,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sameerasw.browser;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ph1ncyn.era;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -385,13 +385,13 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Browser/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Zero;
+				INFOPLIST_KEY_CFBundleDisplayName = era;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Browser needs access to use your camera in websites.";
-				INFOPLIST_KEY_NSHumanReadableCopyright = sameerasw.com;
-				INFOPLIST_KEY_NSLocationUsageDescription = "Browser needs access to use your location in websites.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Browser needs access to use your location in websites.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Browser needs access to use your microphone on websites.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "era needs access to use your camera in websites.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "ph1ncyn, based on Zero by sameerasw";
+				INFOPLIST_KEY_NSLocationUsageDescription = "era needs access to use your location in websites.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "era needs access to use your location in websites.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "era needs access to use your microphone on websites.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -402,7 +402,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = sameerasw.browser;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ph1ncyn.era;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -412,7 +412,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4AC596A82D3C6DC400FF0326 /* Build configuration list for PBXProject "Zero" */ = {
+		4AC596A82D3C6DC400FF0326 /* Build configuration list for PBXProject "era" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4AC596BC2D3C6DC600FF0326 /* Debug */,
@@ -421,7 +421,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4AC596BE2D3C6DC600FF0326 /* Build configuration list for PBXNativeTarget "Zero" */ = {
+		4AC596BE2D3C6DC600FF0326 /* Build configuration list for PBXNativeTarget "era" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4AC596BF2D3C6DC600FF0326 /* Debug */,
