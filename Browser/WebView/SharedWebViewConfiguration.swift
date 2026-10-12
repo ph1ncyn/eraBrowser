@@ -15,6 +15,15 @@ class SharedWebViewConfiguration {
     // Shared configuration with cache, cookies, and other settings
     let configuration: WKWebViewConfiguration
 
+    /// Configuration for No-Trace windows: same settings, scripts and content blockers,
+    /// but backed by a non-persistent data store so nothing is written to disk.
+    /// It is a copy, so the persistent `configuration` is never modified.
+    private(set) lazy var noTraceConfiguration: WKWebViewConfiguration = {
+        let noTraceConfiguration = configuration.copy() as! WKWebViewConfiguration
+        noTraceConfiguration.websiteDataStore = .nonPersistent()
+        return noTraceConfiguration
+    }()
+
     private init() {
         configuration = WKWebViewConfiguration()
 
@@ -46,5 +55,31 @@ class SharedWebViewConfiguration {
         let webPagePreferences = WKWebpagePreferences()
         webPagePreferences.allowsContentJavaScript = true
         configuration.defaultWebpagePreferences = webPagePreferences
+
+        installUserScripts()
+    }
+
+    /// Installs the JavaScript listeners once for every web view.
+    /// Messages are routed to the controller that owns the web view that sent them.
+    private func installUserScripts() {
+        let controller = configuration.userContentController
+        for (resource, messageName) in [("HoverURLListener", "hoverURL"), ("MiddleClickLinkListener", "middleClickLink")] {
+            guard let scriptURL = Bundle.main.url(forResource: resource, withExtension: "js"),
+                  let source = try? String(contentsOf: scriptURL, encoding: .utf8) else { continue }
+            controller.add(WebViewScriptMessageRouter.shared, name: messageName)
+            controller.addUserScript(WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        }
+    }
+}
+
+/// Single script message handler shared by all web views.
+/// `WKUserContentController` retains its handlers, so registering each tab's controller
+/// would leak it and send every tab's messages to the last registered tab.
+final class WebViewScriptMessageRouter: NSObject, WKScriptMessageHandler {
+    static let shared = WebViewScriptMessageRouter()
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard let webView = message.webView as? MyWKWebView else { return }
+        webView.scriptMessageHandler?.handleScriptMessage(message)
     }
 }

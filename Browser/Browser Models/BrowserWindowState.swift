@@ -45,6 +45,16 @@ import SwiftData
     
     var showTabSwitcher = false
 
+    /// eraAI side panel and its conversation (one per window)
+    var showEraAI = false
+    let eraAI = EraAIChat()
+
+    func toggleEraAI() {
+        withAnimation(.browserDefault) {
+            showEraAI.toggle()
+        }
+    }
+
     private(set) var isMainBrowserWindow: Bool = true
     private(set) var isNoTraceWindow: Bool = false
     

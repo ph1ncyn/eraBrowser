@@ -19,10 +19,7 @@ extension WKWebViewController: WKNavigationDelegate {
         if self.tab.url.cleanHost != url.cleanHost {
             self.tab.updateFavicon(with: url)
         }
-        
-        if UserDefaults.standard.bool(forKey: "show_hover_url") {
-            addHoverURLListener()
-        }
+
     }
     
     /// Called when the web view finishes loading a page
@@ -57,9 +54,7 @@ extension WKWebViewController: WKNavigationDelegate {
             """
             webView.evaluateJavaScript(js, completionHandler: nil)
         }
-        
-        // Add middle click link listener
-        addMiddleClickLinkListener()
+
     }
     
     /// Called when the web view fails loading a page

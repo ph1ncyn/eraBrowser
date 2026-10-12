@@ -18,6 +18,10 @@ struct SettingsView: View {
                 SettingsAppearanceView()
             }
             
+            Tab("eraAI", systemImage: "sparkles") {
+                SettingsEraAIView()
+            }
+            
             Tab("Keyboard Shortcuts", systemImage: "command") {
                 SettingsShortcutsView()
             }

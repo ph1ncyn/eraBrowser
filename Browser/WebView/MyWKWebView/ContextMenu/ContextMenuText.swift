@@ -16,6 +16,18 @@ extension MyWKWebView {
         
         let searchWebItem = NSMenuItem(title: "Search With Google", action: #selector(searchWeb), keyEquivalent: "")
         menu.insertItem(searchWebItem, at: 2)
+        
+        let askEraAIItem = NSMenuItem(title: "Ask eraAI", action: #selector(askEraAI), keyEquivalent: "")
+        askEraAIItem.image = NSImage(systemSymbolName: "sparkles", accessibilityDescription: nil)
+        menu.insertItem(askEraAIItem, at: 3)
+    }
+    
+    @objc func askEraAI() {
+        getSelectedText { selectedText in
+            if let selectedText, !selectedText.isEmpty {
+                self.askEraAIAction?(selectedText)
+            }
+        }
     }
     
     @objc func searchWeb() {

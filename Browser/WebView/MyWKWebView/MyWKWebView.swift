@@ -20,6 +20,10 @@ class MyWKWebView: WKWebView {
     var openLinkInNewTabAction: ((URL) -> Void)? = nil
     /// Present an action alert from the WKWebView (passed from the WKWebViewController)
     var presentActionAlert: ((String, String) -> Void)? = nil
+    /// The "Ask eraAI" action for selected text (passed from the WKWebViewController)
+    var askEraAIAction: ((String) -> Void)? = nil
+    /// Receives the JavaScript messages sent by this web view (see `WebViewScriptMessageRouter`)
+    weak var scriptMessageHandler: WKWebViewController?
 
     var textFinder: NSTextFinder
     var textFindBarView: NSView?
@@ -109,7 +113,7 @@ class MyWKWebView: WKWebView {
 
     /// Clears the cookies of the specific host and reloads
     func clearCookiesAndReload() {
-        let cookieStore = WKWebsiteDataStore.default().httpCookieStore
+        let cookieStore = configuration.websiteDataStore.httpCookieStore
         cookieStore.getAllCookies { cookies in
             for cookie in cookies where self.url?.host()?.contains(cookie.domain) == true {
                 cookieStore.delete(cookie)
@@ -120,10 +124,11 @@ class MyWKWebView: WKWebView {
 
     /// Clears the cache of the specific host and reloads
     func clearCacheAndReload() {
-        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+        let dataStore = configuration.websiteDataStore
+        dataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
             for record in records where self.url?.host()?.contains(record.displayName) == true {
                 let types = record.dataTypes.filter { $0.contains("Cache") }
-                WKWebsiteDataStore.default().removeData(ofTypes: types, for: [record], completionHandler: {})
+                dataStore.removeData(ofTypes: types, for: [record], completionHandler: {})
             }
         }
         reload()

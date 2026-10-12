@@ -42,6 +42,8 @@ final class BrowserTab: Identifiable, Comparable {
 
     @Transient var webview: MyWKWebView? = nil
     @Transient var viewController: WKWebViewController? = nil
+    /// Back/forward state (`WKWebView.interactionState`) saved when the web view is unloaded, used to restore the page
+    @Transient var restorationState: Any? = nil
     @Attribute(.ephemeral) var webviewErrorDescription: String? = nil
     @Attribute(.ephemeral) var webviewErrorCode: Int? = nil
 

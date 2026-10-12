@@ -52,6 +52,11 @@ struct ViewCommands: Commands {
             }
             .globalKeyboardShortcut(.showTabSwitcher)
 
+            Button(browserWindowState?.showEraAI == true ? "Hide eraAI" : "Show eraAI") {
+                browserWindowState?.toggleEraAI()
+            }
+            .globalKeyboardShortcut(.toggleEraAI)
+
             Divider()
 
             if let tab = browserWindowState?.currentSpace?.currentTab, let webView = tab.webview {
@@ -95,9 +100,11 @@ struct ViewCommands: Commands {
 
 extension KeyboardShortcuts.Name {
     static let toggleSidebar = Self("toggle_sidebar", default: .init(.s, modifiers: .command))
-    static let toggleSidebarStyle = Self("toggle_sidebar_style", default: .init(.s, modifiers: [.command, .shift]))
+    static let toggleSidebarStyle = Self("toggle_sidebar_style", default: .init(.s, modifiers: [.command, .option]))
 
     static let showTabSwitcher = Self("show_tab_switcher", default: .init(.tab, modifiers: .control))
+
+    static let toggleEraAI = Self("toggle_era_ai", default: .init(.e, modifiers: [.command, .shift]))
 
     static let stopLoading = Self("stop_loading", default: .init(.period, modifiers: .command))
     static let reload = Self("reload", default: .init(.r, modifiers: .command))
@@ -113,5 +120,5 @@ extension KeyboardShortcuts.Name {
 }
 
 extension [KeyboardShortcuts.Name] {
-    static let allViewCommands: [KeyboardShortcuts.Name] = [.toggleSidebar, .toggleSidebarStyle, .showTabSwitcher, .stopLoading, .reload, .clearCookiesAndReload, .clearCacheAndReload, .togglePictureInPicture, .zoomActualSize, .zoomIn, .zoomOut]
+    static let allViewCommands: [KeyboardShortcuts.Name] = [.toggleSidebar, .toggleSidebarStyle, .showTabSwitcher, .toggleEraAI, .stopLoading, .reload, .clearCookiesAndReload, .clearCacheAndReload, .togglePictureInPicture, .zoomActualSize, .zoomIn, .zoomOut]
 }

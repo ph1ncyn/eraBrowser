@@ -116,22 +116,32 @@ struct MainFrame: View {
     // MARK: - Detail (WebView)
     @ViewBuilder
     private var pageView: some View {
-        PageWebView(browserSpaces: browserSpaces)
-            .clipShape(.rect(cornerRadius: cornerRadius))
-            .shadow(radius: shadowRadius)
-            .ignoresSafeArea(edges: userPreferences.extendedSidebarStyle ? .all : [.top, .bottom, .trailing])
-            .animation(.easeInOut(duration: 0.3), value: userPreferences.extendedSidebarStyle)
-            .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { _ in
-                withAnimation(.browserDefault) {
-                    browserWindowState.isFullScreen = true
-                }
+        HStack(spacing: 6) {
+            PageWebView(browserSpaces: browserSpaces)
+                .clipShape(.rect(cornerRadius: cornerRadius))
+                .shadow(radius: shadowRadius)
+
+            if browserWindowState.showEraAI {
+                EraAIPanel(chat: browserWindowState.eraAI)
+                    .frame(width: 340)
+                    .shadow(radius: shadowRadius)
+                    .padding([.top, .bottom, .trailing], 6)
+                    .browserTransition(.move(edge: .trailing).combined(with: .opacity))
             }
-            .onReceive(NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification)) { _ in
-                withAnimation(.browserDefault) {
-                    browserWindowState.isFullScreen = false
-                }
+        }
+        .ignoresSafeArea(edges: userPreferences.extendedSidebarStyle ? .all : [.top, .bottom, .trailing])
+        .animation(.easeInOut(duration: 0.3), value: userPreferences.extendedSidebarStyle)
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { _ in
+            withAnimation(.browserDefault) {
+                browserWindowState.isFullScreen = true
             }
-            .actionAlert()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.willExitFullScreenNotification)) { _ in
+            withAnimation(.browserDefault) {
+                browserWindowState.isFullScreen = false
+            }
+        }
+        .actionAlert()
     }
 
     // MARK: - Computed properties
@@ -175,6 +185,13 @@ struct ConditionalToolbarRemover: ViewModifier {
                         Label("Reload", systemImage: "arrow.trianglehead.clockwise")
                     }
                     .help("Reload")
+
+                    Button {
+                        browserWindowState.toggleEraAI()
+                    } label: {
+                        Label("eraAI", systemImage: "sparkles")
+                    }
+                    .help("Ask eraAI about this page")
                 }
             }
         }

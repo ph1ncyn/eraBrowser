@@ -30,10 +30,10 @@ class WKWebViewController: NSViewController {
         self.browserSpace = browserSpace
         self.userPreferences = userPreferences
 
-        self.configuration = SharedWebViewConfiguration.shared.configuration
-        if noTrace {
-            self.configuration.websiteDataStore = .nonPersistent()
-        }
+        // Never mutate the shared configuration: No-Trace tabs get their own copy with a non-persistent store
+        self.configuration = noTrace
+            ? SharedWebViewConfiguration.shared.noTraceConfiguration
+            : SharedWebViewConfiguration.shared.configuration
 
         self.webView = MyWKWebView(frame: .zero, configuration: self.configuration)
 
@@ -44,7 +44,7 @@ class WKWebViewController: NSViewController {
         view = webView
 
         webView.allowsBackForwardNavigationGestures = true
-        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Safari/605.1.15 (Browser)"
+        webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Safari/605.1.15 era/1.0"
         webView.allowsMagnification = true
     webView.allowsLinkPreview = true // TODO: Implement my own preview later...
     webView.isInspectable = true
@@ -56,14 +56,22 @@ class WKWebViewController: NSViewController {
 
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        webView.scriptMessageHandler = self
 
         webView.searchWebAction = coordinator.searchWebAction(_:)
         webView.openLinkInNewTabAction = coordinator.openLinkInNewTabAction(_:)
         webView.presentActionAlert = coordinator.presentActionAlert(message:systemImage:)
+        webView.askEraAIAction = coordinator.askEraAIAction(_:)
 
         coordinator.observeWebView(webView)
 
-        webView.load(URLRequest(url: tab.url))
+        // Restore the page (with its back/forward history) if the tab was unloaded or closed before
+        if let restorationState = tab.restorationState {
+            tab.restorationState = nil
+            webView.interactionState = restorationState
+        } else {
+            webView.load(URLRequest(url: tab.url))
+        }
 
         startSuspendTimer()
     }
@@ -76,11 +84,44 @@ class WKWebViewController: NSViewController {
     func cleanup() {
         // Only deinit if the tab is not loaded or was closed
         if !browserSpace.loadedTabs.contains(tab) {
-            cancelSuspendTimer()
-            webView.stopLoading()
+            tearDown(saveState: false)
+        }
+    }
+
+    private var isTornDown = false
+
+    /// Stops the page (media, scripts, network) and breaks the reference cycles that kept the
+    /// web view alive after its tab was suspended or closed.
+    /// - Parameter saveState: Keep the back/forward state on the tab so it can be restored later
+    func tearDown(saveState: Bool) {
+        guard !isTornDown else { return }
+        isTornDown = true
+
+        if saveState {
+            tab.restorationState = webView.interactionState
+        }
+
+        cancelSuspendTimer()
+        webView.pauseAllMediaPlayback(completionHandler: nil)
+        webView.stopLoading()
+        // Blank hidden pages right away so audio, timers and workers stop even if SwiftUI keeps the view a bit longer
+        if webView.isHidden || webView.window == nil {
             webView.loadHTMLString("", baseURL: nil)
-            webView.removeFromSuperview()
-            coordinator.stopObservingWebView()
+        }
+        webView.navigationDelegate = nil
+        webView.uiDelegate = nil
+        webView.scriptMessageHandler = nil
+        webView.searchWebAction = nil
+        webView.openLinkInNewTabAction = nil
+        webView.presentActionAlert = nil
+        webView.askEraAIAction = nil
+        coordinator?.stopObservingWebView()
+
+        if tab.webview === webView {
+            tab.webview = nil
+        }
+        if tab.viewController === self {
+            tab.viewController = nil
         }
     }
 
@@ -98,13 +139,14 @@ class WKWebViewController: NSViewController {
 
         suspendTimer = DispatchSource.makeTimerSource(queue: .main)
         suspendTimer?.schedule(deadline: .now() + 60 * 10) // 10 minutes
-        suspendTimer?.setEventHandler {
+        suspendTimer?.setEventHandler { [weak self] in
+            guard let self else { return }
             // Don't suspend if the tab is currently active.
             if self.browserSpace.currentTab == self.tab {
                 self.resetSuspendTimer()
             } else {
                 self.tab.isSuspended = true
-                self.coordinator.parent.browserSpace.unloadTab(self.coordinator.parent.tab)
+                self.browserSpace.unloadTab(self.tab)
             }
         }
 

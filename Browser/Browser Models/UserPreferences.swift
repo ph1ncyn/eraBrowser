@@ -85,6 +85,7 @@ class UserPreferences: ObservableObject {
             "web_content_transparency": false,
             "extended_sidebar_style": false
         ])
+        EraAISettings.registerDefaults()
     }
     
     func getDownloadsFolder() {

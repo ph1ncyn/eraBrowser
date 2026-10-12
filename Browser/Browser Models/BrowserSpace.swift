@@ -109,9 +109,11 @@ final class BrowserSpace: Identifiable {
         colors.map { Color(hex: $0) ?? .clear }
     }
     
-    /// Removes a tab from the ZStack of WebViews of the space
+    /// Removes a tab from the ZStack of WebViews of the space and releases its web view.
+    /// The page state is kept on the tab so it can be restored when the tab is shown again.
     func unloadTab(_ tab: BrowserTab) {
         loadedTabs.removeAll(where: { $0.id == tab.id })
+        tab.viewController?.tearDown(saveState: true)
     }
     
     /// Closes (deletes) a tab from the space and selects the next tab
@@ -152,23 +154,9 @@ final class BrowserSpace: Identifiable {
                 }
             }
             
-            // Note: We don't call unloadTab(tab) here because the user wants
-            // closed tabs to remain in memory for quick restoration.
-            
             do {
-                tab.isClosed = true
-                tab.closedAt = .now
-                
-                // Purge old closed tabs if there are too many (keep last 50)
-                let closed = recentlyClosedTabs
-                if closed.count > 50 {
-                    for i in 50..<closed.count {
-                        let oldTab = closed[i]
-                        unloadTab(oldTab)
-                        modelContext.delete(oldTab)
-                    }
-                }
-                
+                markClosed(tab)
+                purgeOldClosedTabs(using: modelContext)
                 try modelContext.save()
             } catch {
                 print("Error closing tab: \(error)")
@@ -181,14 +169,57 @@ final class BrowserSpace: Identifiable {
             }
         }
     }
+    
+    /// Maximum number of closed tabs kept for "Reopen Closed Tab"
+    static let closedTabsLimit = 50
+    
+    /// Moves several tabs to the recently closed list (they can be restored later)
+    func closeTabs(_ tabsToClose: [BrowserTab], using modelContext: ModelContext) {
+        guard !tabsToClose.isEmpty else { return }
+        withAnimation(.browserDefault) {
+            tabsToClose.forEach { self.markClosed($0) }
+            if let currentTab, tabsToClose.contains(currentTab) {
+                self.currentTab = allTabs.first
+            }
+            purgeOldClosedTabs(using: modelContext)
+            try? modelContext.save()
+        }
+    }
+    
+    /// Hides the tab from the sidebar and releases its web view. The page state stays on the
+    /// tab, so reopening it brings back the page with its back/forward history.
+    private func markClosed(_ tab: BrowserTab) {
+        unloadTab(tab)
+        tab.isClosed = true
+        tab.closedAt = .now
+    }
+    
+    /// Deletes the oldest closed tabs past `closedTabsLimit`
+    private func purgeOldClosedTabs(using modelContext: ModelContext) {
+        let closed = recentlyClosedTabs
+        guard closed.count > Self.closedTabsLimit else { return }
+        for oldTab in closed[Self.closedTabsLimit...] {
+            oldTab.restorationState = nil
+            modelContext.delete(oldTab)
+        }
+    }
 
     func reopenTab(_ tab: BrowserTab, using modelContext: ModelContext) {
         withAnimation(.browserDefault) {
             tab.isClosed = false
             tab.closedAt = nil
+            tab.isSuspended = false
             currentTab = tab
             try? modelContext.save()
         }
+    }
+    
+    /// Reopens the most recently closed tab. Returns `false` if there is nothing to reopen.
+    @discardableResult
+    func reopenLastClosedTab(using modelContext: ModelContext) -> Bool {
+        guard let tab = recentlyClosedTabs.first else { return false }
+        reopenTab(tab, using: modelContext)
+        return true
     }
     
     func clear(using modelContext: ModelContext) {

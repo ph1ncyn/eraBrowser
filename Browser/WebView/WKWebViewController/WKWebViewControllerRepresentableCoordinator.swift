@@ -39,6 +39,15 @@ extension WKWebViewControllerRepresentable {
             self.parent.browserSpace.openNewTab(newTab, using: self.parent.modelContext)
         }
         
+        /// Opens the eraAI panel and asks about the selected text
+        func askEraAIAction(_ selectedText: String) {
+            let browserWindowState = self.parent.browserWindowState
+            withAnimation(.browserDefault) {
+                browserWindowState.showEraAI = true
+            }
+            browserWindowState.eraAI.send("Explain this:\n\n\(selectedText)", about: self.parent.tab)
+        }
+        
         /// Opens a link in a new tab
         func openLinkInNewTabAction(_ url: URL) {
             let insertionOrder = calculateInsertionOrder()

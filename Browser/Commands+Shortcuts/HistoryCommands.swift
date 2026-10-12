@@ -31,6 +31,23 @@ struct HistoryCommands: Commands {
             
             Divider()
             
+            let recentlyClosedTabs = browserWindowState?.currentSpace?.recentlyClosedTabs ?? []
+            
+            Button("Reopen Closed Tab", action: reopenLastClosedTab)
+                .disabled(recentlyClosedTabs.isEmpty)
+                .globalKeyboardShortcut(.reopenClosedTab)
+            
+            Menu("Recently Closed") {
+                ForEach(recentlyClosedTabs.prefix(15)) { tab in
+                    Button(tab.title.isEmpty ? tab.url.absoluteString : tab.title) {
+                        reopen(tab)
+                    }
+                }
+            }
+            .disabled(recentlyClosedTabs.isEmpty)
+            
+            Divider()
+            
             Button("Show History", action: showHistory)
                 .globalKeyboardShortcut(.showHistory)
             
@@ -39,6 +56,17 @@ struct HistoryCommands: Commands {
             }
             .globalKeyboardShortcut(.clearHistory)
         }
+    }
+    
+    func reopenLastClosedTab() {
+        guard let space = browserWindowState?.currentSpace,
+              let tab = space.recentlyClosedTabs.first else { return }
+        reopen(tab)
+    }
+    
+    func reopen(_ tab: BrowserTab) {
+        // Save with the tab's own context; the commands environment may not share the window's container
+        browserWindowState?.currentSpace?.reopenTab(tab, using: tab.modelContext ?? modelContext)
     }
     
     func showHistory() {
@@ -59,10 +87,12 @@ extension KeyboardShortcuts.Name {
     static let goBack = Self("go_back", default: .init(.leftBracket, modifiers: .command))
     static let goForward = Self("go_forward", default: .init(.rightBracket, modifiers: .command))
     
+    static let reopenClosedTab = Self("reopen_closed_tab", default: .init(.t, modifiers: [.command, .shift]))
+    
     static let showHistory = Self("show_history", default: .init(.y, modifiers: .command))
     static let clearHistory = Self("clear_history")
 }
 
 extension [KeyboardShortcuts.Name] {
-    static let allHistoryCommands: [KeyboardShortcuts.Name] = [.goBack, .goForward, .showHistory, .clearHistory]
+    static let allHistoryCommands: [KeyboardShortcuts.Name] = [.goBack, .goForward, .reopenClosedTab, .showHistory, .clearHistory]
 }

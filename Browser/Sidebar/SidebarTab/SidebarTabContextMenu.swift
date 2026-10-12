@@ -105,33 +105,21 @@ struct SidebarTabContextMenu: View {
         browserWindowState.currentSpace?.closeTab(browserTab, using: modelContext)
     }
     
-    /// Close (delete) the tabs below the current tab
+    /// Close the tabs below the current tab (they can be reopened from History)
     func closeTabsBelow() {
         guard let currentSpace = browserWindowState.currentSpace,
                 let index = currentSpace.tabs.firstIndex(where: { $0.id == browserTab.id })
         else { return }
         
-        withAnimation(.browserDefault) {
-            for tab in currentSpace.tabs.suffix(from: index + 1) {
-                currentSpace.unloadTab(tab)
-                modelContext.delete(tab)
-            }
-            try? modelContext.save()
-        }
+        currentSpace.closeTabs(Array(currentSpace.tabs.suffix(from: index + 1)), using: modelContext)
     }
     
-    /// Close (delete) the tabs above the current tab
+    /// Close the tabs above the current tab (they can be reopened from History)
     func closeTabsAbove() {
         guard let currentSpace = browserWindowState.currentSpace,
                 let index = currentSpace.tabs.firstIndex(where: { $0.id == browserTab.id })
         else { return }
         
-        withAnimation(.browserDefault) {
-            for tab in currentSpace.tabs.prefix(upTo: index) {
-                currentSpace.unloadTab(tab)
-                modelContext.delete(tab)
-            }
-            try? modelContext.save()
-        }
+        currentSpace.closeTabs(Array(currentSpace.tabs.prefix(upTo: index)), using: modelContext)
     }
 }
