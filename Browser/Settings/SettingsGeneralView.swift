@@ -14,6 +14,7 @@ struct GeneralSettingsView: View {
             Toggle("Close Selected Tab When Clearing Space", systemImage: "xmark.square", isOn: $userPreferences.clearSelectedTab)
             Toggle("Open Picture in Picture Automatically", systemImage: "inset.filled.topright.rectangle", isOn: $userPreferences.openPipOnTabChange)
             Toggle("Warn Before Quitting", systemImage: "exclamationmark.triangle", isOn: $userPreferences.warnBeforeQuitting)
+            Toggle("Restore Tabs From Last Session", systemImage: "arrow.counterclockwise.circle", isOn: $userPreferences.restoreSession)
             Toggle("Automatic Page Suspension", systemImage: "hand.raised.fill", isOn: $userPreferences.automaticPageSuspension)
             Toggle("Show Hover URL", systemImage: "dot.circle.and.cursorarrow", isOn: $userPreferences.showHoverURL)
             

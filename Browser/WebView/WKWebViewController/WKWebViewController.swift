@@ -65,15 +65,26 @@ class WKWebViewController: NSViewController {
 
         coordinator.observeWebView(webView)
 
-        // Restore the page (with its back/forward history) if the tab was unloaded or closed before
+        // Restore the page (with its back/forward history) if the tab was unloaded or closed before,
+        // or from the state saved in the previous session
         if let restorationState = tab.restorationState {
             tab.restorationState = nil
             webView.interactionState = restorationState
+        } else if UserDefaults.standard.bool(forKey: "restore_session"), let sessionState = tab.sessionState {
+            webView.interactionState = sessionState
         } else {
             webView.load(URLRequest(url: tab.url))
         }
 
         startSuspendTimer()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillTerminate), name: NSApplication.willTerminateNotification, object: nil)
+    }
+
+    /// Saves the page's back/forward state so the session can be restored on the next launch
+    @objc private func applicationWillTerminate() {
+        tab.saveSessionState()
+        try? tab.modelContext?.save()
     }
 
     deinit {
@@ -99,6 +110,9 @@ class WKWebViewController: NSViewController {
 
         if saveState {
             tab.restorationState = webView.interactionState
+            if let state = webView.interactionState as? Data {
+                tab.sessionState = state
+            }
         }
 
         cancelSuspendTimer()
@@ -116,6 +130,7 @@ class WKWebViewController: NSViewController {
         webView.presentActionAlert = nil
         webView.askEraAIAction = nil
         coordinator?.stopObservingWebView()
+        NotificationCenter.default.removeObserver(self, name: NSApplication.willTerminateNotification, object: nil)
 
         if tab.webview === webView {
             tab.webview = nil

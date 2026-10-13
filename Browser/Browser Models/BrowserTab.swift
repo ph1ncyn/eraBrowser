@@ -29,6 +29,9 @@ final class BrowserTab: Identifiable, Comparable {
     var isClosed: Bool = false
     var closedAt: Date? = nil
 
+    /// Saved `WKWebView.interactionState` (back/forward history, scroll position), used to restore the tab after a relaunch
+    @Attribute(.externalStorage) var sessionState: Data? = nil
+
     @Relationship var browserSpace: BrowserSpace?
 
     init(title: String, favicon: Data? = nil, url: URL, order: Int = 0, browserSpace: BrowserSpace?, type: BrowserTabType = .web) {
@@ -71,6 +74,12 @@ final class BrowserTab: Identifiable, Comparable {
                 print("Error finding favicon: \(error.localizedDescription)")
             }
         }
+    }
+
+    /// Saves the web view's back/forward state so the tab can be restored after a relaunch
+    func saveSessionState() {
+        guard let state = webview?.interactionState as? Data else { return }
+        sessionState = state
     }
 
     /// Reloads the tab

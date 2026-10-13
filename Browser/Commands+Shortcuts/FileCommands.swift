@@ -35,10 +35,12 @@ struct FileCommands: Commands {
         }
         
         CommandGroup(replacing: .saveItem) {
-            if let currentTab = browserWindowState?.currentSpace?.currentTab {
-                Button("Close Tab") { browserWindowState?.currentSpace?.closeTab(currentTab, using: modelContext) }
-                    .globalKeyboardShortcut(.closeTab)
+            // Always present: with no tab left, ⌘W does nothing instead of closing the window
+            Button("Close Tab") {
+                guard let space = browserWindowState?.currentSpace, let currentTab = space.currentTab else { return }
+                space.closeTab(currentTab, using: currentTab.modelContext ?? modelContext)
             }
+            .globalKeyboardShortcut(.closeTab)
             
             Button("Close Window", action: NSApp.keyWindow?.close)
                 .globalKeyboardShortcut(.closeWindow)

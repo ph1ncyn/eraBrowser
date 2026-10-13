@@ -30,6 +30,11 @@ class BrowserAppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         deleteTemporaryImages()
     }
     
+    /// Keep era running when the last window is closed (reopen it from the Dock)
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
+    }
+    
     func applicationWillTerminate(_ notification: Notification) {
         closeNotMainWindows()
     }

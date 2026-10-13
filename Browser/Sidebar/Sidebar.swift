@@ -33,6 +33,7 @@ struct Sidebar: View {
         .opacity(sidebarModel.currentSidebarWidth == 0 ? 0 : 1)
         .gesture(WindowDragGesture()) // Move the browser window by dragging the sidebar
         .task {
+            applyLaunchSessionPolicy()
             if browserSpaces.isEmpty {
                 createSpace()
             } else if !NSApp.isKeyWindowOfTypeMain && !NSApp.isKeyWindowSettings && browserSpaces.isEmpty {
@@ -59,6 +60,19 @@ struct Sidebar: View {
                     .padding(.leading, .sidebarPadding)
                     .padding(.bottom, 44)
             }
+        }
+    }
+    
+    /// Closes the previous session's tabs once per launch when "Restore Tabs From Last Session" is off.
+    /// Pinned tabs are kept, closed tabs can still be reopened from History.
+    private static var didApplyLaunchSessionPolicy = false
+    
+    private func applyLaunchSessionPolicy() {
+        guard !Self.didApplyLaunchSessionPolicy, browserWindowState.isMainBrowserWindow else { return }
+        Self.didApplyLaunchSessionPolicy = true
+        guard !userPreferences.restoreSession else { return }
+        for space in browserSpaces {
+            space.closeTabs(space.tabs, using: modelContext)
         }
     }
     

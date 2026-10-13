@@ -38,6 +38,9 @@ class UserPreferences: ObservableObject {
     
     @AppStorage("automatic_page_suspension") var automaticPageSuspension = true
     
+    /// Reopen the tabs, selected tab and page history of the last session on launch
+    @AppStorage("restore_session") var restoreSession = true
+    
     @AppStorage("custom_website_searchers") var customWebsiteSearchers = [BrowserCustomSearcher]()
     
     @AppStorage("show_hover_url") var showHoverURL = true
@@ -83,7 +86,8 @@ class UserPreferences: ObservableObject {
             "automatic_page_suspension": true,
             "show_hover_url": true,
             "web_content_transparency": false,
-            "extended_sidebar_style": false
+            "extended_sidebar_style": false,
+            "restore_session": true
         ])
         EraAISettings.registerDefaults()
     }

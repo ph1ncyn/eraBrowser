@@ -54,6 +54,9 @@ final class BrowserSpace: Identifiable {
     
     var pinnedTabsVisible: Bool = true
     
+    /// The tab that was selected last, restored when the browser is relaunched
+    var lastSelectedTabID: UUID? = nil
+    
     var recentlyClosedTabs: [BrowserTab] {
         let allUnordered = (unorderedTabs ?? []) + (unorderedPinnedTabs ?? [])
         return allUnordered.filter { $0.isClosed }

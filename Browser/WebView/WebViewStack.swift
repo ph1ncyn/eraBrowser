@@ -11,6 +11,10 @@ import SwiftUI
 struct WebViewStack: View {
     @Bindable var browserSpace: BrowserSpace
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.modelContext) var modelContext
+    @Environment(BrowserWindowState.self) var browserWindowState
+    @EnvironmentObject var userPreferences: UserPreferences
+
     var body: some View {
         ZStack {
             if let currentTab = browserSpace.currentTab {
@@ -27,29 +31,64 @@ struct WebViewStack: View {
                     }
                 }
             } else {
-                // Show app logo in the empty area. Invert the image when in light mode
-                // so it remains visible against a light background.
-
-                Group {
-                    if colorScheme == .light {
-                        Image("logo")
-                            .renderingMode(.original)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .opacity(0.3)
-                            .colorInvert()
-                    } else {
-                        Image("logo")
-                            .renderingMode(.original)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .opacity(0.3)
-                    }
-                }
+                emptyState
             }
         }
         .transaction { $0.animation = .bouncy(duration: 0.3) }
+        .onAppear(perform: restoreLastSelectedTab)
+        .onChange(of: browserSpace.currentTab) { _, newValue in
+            browserSpace.lastSelectedTabID = newValue?.id
+        }
+    }
+
+    /// Selects the tab that was selected when the browser was closed
+    private func restoreLastSelectedTab() {
+        guard browserSpace.currentTab == nil,
+              userPreferences.restoreSession,
+              let lastSelectedTabID = browserSpace.lastSelectedTabID,
+              let tab = browserSpace.allTabs.first(where: { $0.id == lastSelectedTabID && !$0.isSuspended })
+        else { return }
+        browserSpace.currentTab = tab
+    }
+
+    /// Shown when the space has no selected tab (e.g. after closing the last one): the window stays open
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            // Invert the logo in light mode so it remains visible against a light background
+            Image("logo")
+                .renderingMode(.original)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 100, height: 100)
+                .opacity(0.3)
+                .modifier(InvertInLightMode(colorScheme: colorScheme))
+
+            HStack(spacing: 10) {
+                Button("New Tab", systemImage: "plus") {
+                    browserWindowState.toggleNewTabSearch()
+                }
+                .disabled(!browserWindowState.spaceCanOpenNewTab())
+
+                if !browserSpace.recentlyClosedTabs.isEmpty {
+                    Button("Reopen Closed Tab", systemImage: "arrow.uturn.backward") {
+                        browserSpace.reopenLastClosedTab(using: modelContext)
+                    }
+                }
+            }
+            .buttonStyle(.bordered)
+            .opacity(0.8)
+        }
+    }
+}
+
+private struct InvertInLightMode: ViewModifier {
+    let colorScheme: ColorScheme
+
+    func body(content: Content) -> some View {
+        if colorScheme == .light {
+            content.colorInvert()
+        } else {
+            content
+        }
     }
 }

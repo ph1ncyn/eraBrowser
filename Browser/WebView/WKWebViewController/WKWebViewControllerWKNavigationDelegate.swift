@@ -28,6 +28,7 @@ extension WKWebViewController: WKNavigationDelegate {
         print("🟢 Finished loading \(url.absoluteString)")
         
         coordinator.addTabToHistory()
+        tab.saveSessionState()
                 
         self.tab.webviewErrorCode = nil
         self.tab.webviewErrorDescription = nil
