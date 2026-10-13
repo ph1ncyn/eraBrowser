@@ -17,17 +17,35 @@ struct WebViewStack: View {
 
     var body: some View {
         ZStack {
-            if let currentTab = browserSpace.currentTab {
-                ForEach(browserSpace.allTabs.filter { browserSpace.loadedTabs.contains($0) || $0 == currentTab }) { tab in
-                    WebView(tab: tab, browserSpace: browserSpace)
-                    .zIndex(tab == currentTab ? 1 : 0)
-                    .opacity(tab == currentTab ? 1 : 0)
-                    .scaleEffect(tab == currentTab ? 1 : 0.95)
-                    .animation(.bouncy(duration: 0.3), value: browserSpace.currentTab)
-                    .onAppear {
-                        if !browserSpace.loadedTabs.contains(tab) {
-                            browserSpace.loadedTabs.append(tab)
-                        }
+            if browserSpace.currentTab != nil {
+                // The current tab, or all the tabs of its split view
+                let visibleTabs = browserWindowState.visibleTabs(in: browserSpace)
+                let isSplit = visibleTabs.count > 1
+
+                SplitViewLayout(visibleIDs: visibleTabs.map(\.id), style: browserWindowState.splitLayout(in: browserSpace)) {
+                    ForEach(browserSpace.allTabs.filter { browserSpace.loadedTabs.contains($0) || visibleTabs.contains($0) }) { tab in
+                        let isVisible = visibleTabs.contains(tab)
+                        WebView(tab: tab, browserSpace: browserSpace)
+                            .clipShape(.rect(cornerRadius: isSplit ? 8 : 0))
+                            .overlay {
+                                // Highlight the focused pane of a split view
+                                if isSplit && tab == browserSpace.currentTab {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .strokeBorder(browserSpace.getColors.first ?? .accentColor, lineWidth: 2)
+                                        .opacity(0.8)
+                                        .allowsHitTesting(false)
+                                }
+                            }
+                            .zIndex(isVisible ? 1 : 0)
+                            .opacity(isVisible ? 1 : 0)
+                            .scaleEffect(isVisible ? 1 : 0.95)
+                            .animation(.bouncy(duration: 0.3), value: browserSpace.currentTab)
+                            .onAppear {
+                                if !browserSpace.loadedTabs.contains(tab) {
+                                    browserSpace.loadedTabs.append(tab)
+                                }
+                            }
+                            .layoutValue(key: SplitTabIDKey.self, value: tab.id)
                     }
                 }
             } else {

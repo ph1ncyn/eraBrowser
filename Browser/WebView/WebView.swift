@@ -64,7 +64,7 @@ struct WebView: View {
                     }
             case .history:
                 HistoryView(browserTab: tab)
-                    .opacity(browserWindowState.currentSpace?.currentTab == tab ? 1 : 0)
+                    .opacity(browserWindowState.visibleTabs(in: browserSpace).contains(tab) ? 1 : 0)
             }
         }
         .overlay(alignment: .top) {

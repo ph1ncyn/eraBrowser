@@ -39,6 +39,14 @@ extension WKWebViewControllerRepresentable {
             self.parent.browserSpace.openNewTab(newTab, using: self.parent.modelContext)
         }
         
+        /// Makes this tab the current tab when the user clicks it in a split view
+        func focusTab() {
+            guard self.parent.browserSpace.currentTab != self.parent.tab,
+                  self.parent.browserWindowState.visibleTabs(in: self.parent.browserSpace).contains(self.parent.tab)
+            else { return }
+            self.parent.browserSpace.currentTab = self.parent.tab
+        }
+        
         /// Opens the eraAI panel and asks about the selected text
         func askEraAIAction(_ selectedText: String) {
             let browserWindowState = self.parent.browserWindowState

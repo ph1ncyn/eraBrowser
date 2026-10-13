@@ -37,7 +37,7 @@ struct WKWebViewControllerRepresentable: NSViewControllerRepresentable {
 
     func updateNSViewController(_ nsViewController: WKWebViewController, context: Context) {
         let wasHidden = nsViewController.webView.isHidden
-        nsViewController.webView.isHidden = tab != browserSpace.currentTab
+        nsViewController.webView.isHidden = !browserWindowState.visibleTabs(in: browserSpace).contains(tab)
                                             || tab.webviewErrorDescription != nil
                                             || tab.webviewErrorCode != nil
         nsViewController.webView.findBarView?.isHidden = nsViewController.webView.isHidden

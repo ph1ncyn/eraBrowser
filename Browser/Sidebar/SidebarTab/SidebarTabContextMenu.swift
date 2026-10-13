@@ -36,6 +36,8 @@ struct SidebarTabContextMenu: View {
             
             Button("Duplicate Tab", action: duplicateTab)
             
+            splitViewItems
+            
             if browserTab.browserSpace?.pinnedTabs.contains(browserTab) == false {
                 Button("Suspend Tab", action: suspendTab)
             }
@@ -55,6 +57,36 @@ struct SidebarTabContextMenu: View {
                 
                 if browserTab.order > 0 {
                     Button("Close Tabs Above", action: closeTabsAbove)
+                }
+            }
+        }
+    }
+    
+    /// Split View items: show this tab next to the current tab, remove it, change the layout
+    @ViewBuilder
+    var splitViewItems: some View {
+        if let space = browserWindowState.currentSpace, browserTab.type == .web {
+            Divider()
+            
+            if browserWindowState.isInSplit(browserTab, in: space) {
+                Button("Remove From Split View", systemImage: "rectangle.badge.minus") {
+                    browserWindowState.removeFromSplit(browserTab, in: space)
+                }
+                
+                Menu("Split Layout") {
+                    ForEach(SplitLayoutStyle.allCases) { layout in
+                        Button(layout.title, systemImage: layout.systemImage) {
+                            browserWindowState.setSplitLayout(layout, in: space)
+                        }
+                    }
+                }
+                
+                Button("Close Split View", systemImage: "rectangle") {
+                    browserWindowState.closeSplit(in: space)
+                }
+            } else if space.currentTab != nil && space.currentTab != browserTab {
+                Button("Open in Split View", systemImage: "rectangle.split.2x1") {
+                    browserWindowState.addToSplit(browserTab, in: space)
                 }
             }
         }

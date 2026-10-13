@@ -52,6 +52,31 @@ struct ViewCommands: Commands {
             }
             .globalKeyboardShortcut(.showTabSwitcher)
 
+            Menu("Split View") {
+                Button("Split With Next Tab") {
+                    browserWindowState?.splitCurrentTabWithNext()
+                }
+                .globalKeyboardShortcut(.splitWithNextTab)
+
+                if let browserWindowState, let space = browserWindowState.currentSpace, browserWindowState.isShowingSplit(in: space) {
+                    Button("Change Layout (\(browserWindowState.splitLayout(in: space).next.title))") {
+                        browserWindowState.setSplitLayout(browserWindowState.splitLayout(in: space).next, in: space)
+                    }
+                    .globalKeyboardShortcut(.changeSplitLayout)
+
+                    if let currentTab = space.currentTab {
+                        Button("Remove Current Tab From Split View") {
+                            browserWindowState.removeFromSplit(currentTab, in: space)
+                        }
+                    }
+
+                    Button("Close Split View") {
+                        browserWindowState.closeSplit(in: space)
+                    }
+                    .globalKeyboardShortcut(.closeSplitView)
+                }
+            }
+
             Button(browserWindowState?.showEraAI == true ? "Hide eraAI" : "Show eraAI") {
                 browserWindowState?.toggleEraAI()
             }
@@ -106,6 +131,10 @@ extension KeyboardShortcuts.Name {
 
     static let toggleEraAI = Self("toggle_era_ai", default: .init(.e, modifiers: [.command, .shift]))
 
+    static let splitWithNextTab = Self("split_with_next_tab", default: .init(.backslash, modifiers: [.command]))
+    static let changeSplitLayout = Self("change_split_layout", default: .init(.backslash, modifiers: [.command, .option]))
+    static let closeSplitView = Self("close_split_view", default: .init(.backslash, modifiers: [.command, .shift]))
+
     static let stopLoading = Self("stop_loading", default: .init(.period, modifiers: .command))
     static let reload = Self("reload", default: .init(.r, modifiers: .command))
     static let clearCookiesAndReload = Self("clear_cookies_and_reload")
@@ -120,5 +149,5 @@ extension KeyboardShortcuts.Name {
 }
 
 extension [KeyboardShortcuts.Name] {
-    static let allViewCommands: [KeyboardShortcuts.Name] = [.toggleSidebar, .toggleSidebarStyle, .showTabSwitcher, .toggleEraAI, .stopLoading, .reload, .clearCookiesAndReload, .clearCacheAndReload, .togglePictureInPicture, .zoomActualSize, .zoomIn, .zoomOut]
+    static let allViewCommands: [KeyboardShortcuts.Name] = [.toggleSidebar, .toggleSidebarStyle, .showTabSwitcher, .toggleEraAI, .splitWithNextTab, .changeSplitLayout, .closeSplitView, .stopLoading, .reload, .clearCookiesAndReload, .clearCacheAndReload, .togglePictureInPicture, .zoomActualSize, .zoomIn, .zoomOut]
 }

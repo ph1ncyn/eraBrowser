@@ -44,6 +44,11 @@ struct PageWebView: View {
         .animation(.easeInOut(duration: 0.3), value: scrollState)
         // Try to enter Picture in Picture of current tab when tab changes or app goes to background
         .onChange(of: browserWindowState.currentSpace?.currentTab) { oldValue, newValue in
+            // Moving the focus between the panes of a split view keeps both pages on screen
+            if let space = browserWindowState.currentSpace, let oldValue, let newValue,
+               browserWindowState.isInSplit(oldValue, in: space) && browserWindowState.isInSplit(newValue, in: space) {
+                return
+            }
             if userPreferences.openPipOnTabChange {
                 if let oldValue {
                     oldValue.webview?.togglePictureInPicture()

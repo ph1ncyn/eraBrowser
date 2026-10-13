@@ -14,6 +14,7 @@ struct SidebarTab: View {
     @Environment(\.modelContext) var modelContext
 
     @EnvironmentObject var userPreferences: UserPreferences
+    @Environment(BrowserWindowState.self) var browserWindowState
 
     @Bindable var browserSpace: BrowserSpace
     @Bindable var browserTab: BrowserTab
@@ -34,6 +35,13 @@ struct SidebarTab: View {
                 .truncationMode(.tail)
 
             Spacer()
+
+            if browserWindowState.isInSplit(browserTab, in: browserSpace) {
+                Image(systemName: "rectangle.split.2x1")
+                    .font(.caption)
+                    .opacity(0.6)
+                    .help("In Split View")
+            }
 
             if isHoveringTab {
                 closeTabButton

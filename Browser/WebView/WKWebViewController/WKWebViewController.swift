@@ -62,6 +62,9 @@ class WKWebViewController: NSViewController {
         webView.openLinkInNewTabAction = coordinator.openLinkInNewTabAction(_:)
         webView.presentActionAlert = coordinator.presentActionAlert(message:systemImage:)
         webView.askEraAIAction = coordinator.askEraAIAction(_:)
+        webView.didReceiveFocusAction = { [weak self] in
+            self?.coordinator?.focusTab()
+        }
 
         coordinator.observeWebView(webView)
 
@@ -129,6 +132,7 @@ class WKWebViewController: NSViewController {
         webView.openLinkInNewTabAction = nil
         webView.presentActionAlert = nil
         webView.askEraAIAction = nil
+        webView.didReceiveFocusAction = nil
         coordinator?.stopObservingWebView()
         NotificationCenter.default.removeObserver(self, name: NSApplication.willTerminateNotification, object: nil)
 
@@ -156,8 +160,8 @@ class WKWebViewController: NSViewController {
         suspendTimer?.schedule(deadline: .now() + 60 * 10) // 10 minutes
         suspendTimer?.setEventHandler { [weak self] in
             guard let self else { return }
-            // Don't suspend if the tab is currently active.
-            if self.browserSpace.currentTab == self.tab {
+            // Don't suspend if the tab is currently active or visible in a split view.
+            if self.browserSpace.currentTab == self.tab || !self.webView.isHidden {
                 self.resetSuspendTimer()
             } else {
                 self.tab.isSuspended = true

@@ -22,6 +22,8 @@ class MyWKWebView: WKWebView {
     var presentActionAlert: ((String, String) -> Void)? = nil
     /// The "Ask eraAI" action for selected text (passed from the WKWebViewController)
     var askEraAIAction: ((String) -> Void)? = nil
+    /// Called when the user clicks in the page, used to focus a pane of a split view
+    var didReceiveFocusAction: (() -> Void)? = nil
     /// Receives the JavaScript messages sent by this web view (see `WebViewScriptMessageRouter`)
     weak var scriptMessageHandler: WKWebViewController?
 
@@ -41,6 +43,16 @@ class MyWKWebView: WKWebView {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        didReceiveFocusAction?()
+        super.mouseDown(with: event)
+    }
+
+    override func rightMouseDown(with event: NSEvent) {
+        didReceiveFocusAction?()
+        super.rightMouseDown(with: event)
     }
 
     func zoomActualSize() {

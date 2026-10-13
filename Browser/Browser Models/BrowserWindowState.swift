@@ -45,6 +45,9 @@ import SwiftData
     
     var showTabSwitcher = false
 
+    /// Split views of this window, by space id (see SplitView.swift)
+    var splitGroups: [UUID: SplitGroup] = [:]
+
     /// eraAI side panel and its conversation (one per window)
     var showEraAI = false
     let eraAI = EraAIChat()

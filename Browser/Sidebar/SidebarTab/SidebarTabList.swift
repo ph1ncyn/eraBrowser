@@ -18,6 +18,8 @@ struct SidebarTabList: View {
     
     @State var draggingTab: BrowserTab?
     
+    @Environment(BrowserWindowState.self) var browserWindowState
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             ForEach(tabs) { browserTab in
@@ -25,6 +27,7 @@ struct SidebarTabList: View {
                     .draggable(browserSpace.id.uuidString) {
                        SidebarTab(browserSpace: browserSpace, browserTab: browserTab, dragging: true)
                             .opacity(0.65)
+                            .environment(browserWindowState)
                     }
                 // Using simultaneousGesture because onAppear is causing unexpected behavior
                     .simultaneousGesture(
