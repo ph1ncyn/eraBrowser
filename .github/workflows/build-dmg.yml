@@ -1,0 +1,81 @@
+name: Build DMG
+
+on:
+  push:
+    branches: [main, "claude/**"]
+    paths-ignore: ["**.md", "eraAI-server/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-dmg-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE"; fi
+          xcodebuild -version
+
+      - name: Build era.app
+        run: |
+          set -o pipefail
+          # Ad-hoc signature: no Apple Developer account needed (Gatekeeper will ask to confirm on first launch)
+          xcodebuild build \
+            -project era.xcodeproj \
+            -scheme era \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM= \
+            ONLY_ACTIVE_ARCH=NO \
+            2>&1 | tee build.log | grep -E "error:|warning: .*(isolat|Sendable)|BUILD (SUCCEEDED|FAILED)" || true
+          if ! grep -q "BUILD SUCCEEDED" build.log; then
+            echo "::group::Errors"
+            grep -E "error:" build.log | sort -u | head -200
+            echo "::endgroup::"
+            exit 1
+          fi
+
+      - name: Create DMG
+        run: |
+          APP="build/Build/Products/Release/era.app"
+          test -d "$APP"
+          mkdir dmg
+          cp -R "$APP" dmg/
+          ln -s /Applications dmg/Applications
+          hdiutil create -volname era -srcfolder dmg -ov -format UDZO era.dmg
+          ls -lh era.dmg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: era-dmg
+          path: era.dmg
+
+      - name: Publish release (stable download link)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          NOTES="Built from ${GITHUB_REF_NAME} @ ${SHORT_SHA}.
+
+          Install: open era.dmg and drag era to Applications.
+          The app is ad-hoc signed (not notarized): on first launch right click era → Open,
+          or run: xattr -dr com.apple.quarantine /Applications/era.app"
+          gh release delete latest-build --cleanup-tag --yes || true
+          gh release create latest-build era.dmg \
+            --title "era — latest build (${SHORT_SHA})" \
+            --notes "$NOTES" \
+            --prerelease \
+            --target "$GITHUB_SHA"
