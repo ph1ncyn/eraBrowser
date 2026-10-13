@@ -46,20 +46,15 @@ struct MainFrame: View {
                 SidebarSpaceBackground(browserSpace: currentSpace, isSidebarCollapsed: false)
             }
         }
-        .popover(
-            isPresented: .init(
-                get: { browserWindowState.searchOpenLocation != .none },
-                set: { newValue in
-                    if !newValue {
-                        browserWindowState.searchOpenLocation = .none
-                    }
+        // Spotlight-style search (New Tab ⌘T, Open Location ⌘L, click on the address bar)
+        .overlay {
+            ZStack {
+                if browserWindowState.searchOpenLocation != nil {
+                    SpotlightSearchView()
+                        .transition(.opacity)
                 }
-            ),
-        ) {
-            SearchView()
-                .environment(browserWindowState)
-                .frame(width: browserWindowState.searchPanelSize.width,
-                       height: browserWindowState.searchPanelSize.height)
+            }
+            .animation(userPreferences.disableAnimations ? nil : .snappy(duration: 0.2), value: browserWindowState.searchOpenLocation)
         }
 
         // Show the tab switcher as a pop-out
@@ -178,20 +173,6 @@ struct ConditionalToolbarRemover: ViewModifier {
                         Label("Forward", systemImage: "arrow.right")
                     }
                     .help("Go forward")
-
-                    Button {
-                        browserWindowState.refreshButtonAction()
-                    } label: {
-                        Label("Reload", systemImage: "arrow.trianglehead.clockwise")
-                    }
-                    .help("Reload")
-
-                    Button {
-                        browserWindowState.toggleEraAI()
-                    } label: {
-                        Label("eraAI", systemImage: "sparkles")
-                    }
-                    .help("Ask eraAI about this page")
                 }
             }
         }

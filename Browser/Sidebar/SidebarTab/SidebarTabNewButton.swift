@@ -19,7 +19,16 @@ struct SidebarTabNewButton: View {
     
     var body: some View {
         Button(action: openNewTabSearch) {
-            Label("New Tab", systemImage: "plus")
+            HStack {
+                Label("New Tab", systemImage: "plus")
+                Spacer()
+                if isHovering {
+                    Text("⌘T")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .padding(.trailing, 8)
+                }
+            }
                 .padding(.leading, .sidebarPadding)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .frame(height: 30)

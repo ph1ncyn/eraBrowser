@@ -26,7 +26,7 @@ struct SidebarSpaceView: View {
                 Label(browserSpace.name, systemImage: browserSpace.systemImage)
                     .lineLimit(1)
                     .foregroundStyle(.secondary)
-                    .fontWeight(.bold)
+                    .font(.subheadline.weight(.semibold))
                     .padding(.leading, .sidebarPadding * 2)
                 // This is a workaround to prevent the label from appearing from the bottom
                     .transaction { $0.animation = nil }

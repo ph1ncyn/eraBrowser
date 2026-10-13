@@ -69,6 +69,12 @@ struct SidebarBottomToolbar: View {
                     .allowsHitTesting(false)
             }
             
+            Button("eraAI", systemImage: "sparkles") {
+                browserWindowState.toggleEraAI()
+            }
+            .buttonStyle(.sidebarHover(padding: 2, enabledColor: browserWindowState.showEraAI ? (browserWindowState.currentSpace?.getColors.first ?? .accentColor) : foregroundColor))
+            .help("Ask eraAI about this page (⌘⇧E)")
+            
             Spacer()
             
             if browserWindowState.isMainBrowserWindow {

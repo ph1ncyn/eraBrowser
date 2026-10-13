@@ -7,44 +7,11 @@
 
 import SwiftUI
 
-/// Toolbar with buttons (traffic lights, web navigation) for the sidebar
+/// Buttons next to the address bar: the web extensions (and "Add to era" on store pages)
 struct SidebarToolbar: View {
-    
-    @Environment(\.modelContext) var modelContext
-    
-    @Environment(SidebarModel.self) var sidebarModel
-    
-    @EnvironmentObject var userPreferences: UserPreferences
-    @Environment(BrowserWindowState.self) var browserWindowState
-    
     let browserSpaces: [BrowserSpace]
     
-    var currentTab: BrowserTab? {
-        browserWindowState.currentSpace?.currentTab
-    }
-    
-    /// Check if styles are enabled for the current website
-    var areStylesEnabledForCurrentSite: Bool {
-        guard let url = currentTab?.url else { return false }
-        return StyleManager.shared.areStylesEnabled(for: url)
-    }
-    
     var body: some View {
-            HStack {
-                SidebarExtensionButtons()
-                
-                Button(action: { 
-                    if let url = currentTab?.url {
-                        StyleManager.shared.toggleStyles(for: url)
-                        // Reapply styles to current tab
-                        if let viewController = currentTab?.viewController {
-                            viewController.applyTransparency()
-                        }
-                    }
-                }) {
-                    Image(systemName: areStylesEnabledForCurrentSite ? "app.background.dotted" : "app.translucent")
-                }
-                .buttonStyle(.sidebarHover(enabledColor: .primary, disabled: currentTab == nil, disabledColor: .primary))
-            }
-        }
+        SidebarExtensionButtons()
+    }
 }

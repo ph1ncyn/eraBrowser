@@ -74,31 +74,55 @@ struct WebViewStack: View {
 
     /// Shown when the space has no selected tab (e.g. after closing the last one): the window stays open
     private var emptyState: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 22) {
             // Invert the logo in light mode so it remains visible against a light background
             Image("logo")
                 .renderingMode(.original)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 100, height: 100)
-                .opacity(0.3)
+                .frame(width: 72, height: 72)
+                .opacity(0.35)
                 .modifier(InvertInLightMode(colorScheme: colorScheme))
 
-            HStack(spacing: 10) {
-                Button("New Tab", systemImage: "plus") {
-                    browserWindowState.toggleNewTabSearch()
+            // Looks like the search field, opens the Spotlight search
+            Button {
+                browserWindowState.toggleNewTabSearch()
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.title3.weight(.medium))
+                    Text("Search or enter address")
+                    Spacer()
+                    KeyCap("⌘T")
                 }
-                .disabled(!browserWindowState.spaceCanOpenNewTab())
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 18)
+                .frame(width: 440, height: 48)
+                .contentShape(Rectangle())
+                .glassEffect(in: .capsule)
+            }
+            .buttonStyle(.plain)
+            .disabled(!browserWindowState.spaceCanOpenNewTab())
 
+            HStack(spacing: 18) {
                 if !browserSpace.recentlyClosedTabs.isEmpty {
-                    Button("Reopen Closed Tab", systemImage: "arrow.uturn.backward") {
+                    Button {
                         browserSpace.reopenLastClosedTab(using: modelContext)
+                    } label: {
+                        Label("Reopen Closed Tab", systemImage: "arrow.uturn.backward")
                     }
                 }
+                Button {
+                    browserWindowState.toggleEraAI()
+                } label: {
+                    Label("Ask eraAI", systemImage: "sparkles")
+                }
             }
-            .buttonStyle(.bordered)
-            .opacity(0.8)
+            .buttonStyle(.plain)
+            .font(.callout)
+            .foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

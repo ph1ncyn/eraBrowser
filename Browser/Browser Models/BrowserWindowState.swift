@@ -27,12 +27,6 @@ import SwiftData
     var viewScrollState: UUID?
     
     var searchOpenLocation: SearchOpenLocation? = .none
-    var searchPanelOrigin: CGPoint {
-        searchOpenLocation == .fromNewTab ? .zero : CGPoint(x: 5, y: 50)
-    }
-    var searchPanelSize: CGSize {
-        searchOpenLocation == .fromNewTab ? CGSize(width: 700, height: 300) : CGSize(width: 400, height: 300)
-    }
     
     var showURLQRCode = false
     var showAcknowledgements = false

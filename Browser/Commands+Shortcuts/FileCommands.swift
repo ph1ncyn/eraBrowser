@@ -19,6 +19,14 @@ struct FileCommands: Commands {
         CommandGroup(replacing: .newItem) {
             Button("New Tab", action: browserWindowState?.toggleNewTabSearch)
                 .globalKeyboardShortcut(.newTab)
+            Button("Open Location…") {
+                guard let browserWindowState, browserWindowState.currentSpace?.currentTab != nil else {
+                    browserWindowState?.toggleNewTabSearch()
+                    return
+                }
+                browserWindowState.searchOpenLocation = .fromURLBar
+            }
+            .globalKeyboardShortcut(.openLocation)
 
             Button("New Window") { openWindow(id: "BrowserWindow") }
             .globalKeyboardShortcut(.newWindow)
@@ -95,6 +103,7 @@ struct FileCommands: Commands {
 
 extension KeyboardShortcuts.Name {
     static let newTab = Self("new_tab", default: .init(.t, modifiers: .command))
+    static let openLocation = Self("open_location", default: .init(.l, modifiers: .command))
     static let newWindow = Self("new_window", default: .init(.n, modifiers: [.command]))
     static let newTemporaryWindow = Self("new_temporary_window", default: .init(.n, modifiers: [.command, .option]))
     static let newNoTraceWindow = Self("new_notrace_window", default: .init(.n, modifiers: [.command, .shift]))
@@ -116,5 +125,5 @@ extension KeyboardShortcuts.Name {
 }
 
 extension [KeyboardShortcuts.Name] {
-    static let allFileCommands: [KeyboardShortcuts.Name] = [.newTab, .newWindow, .newTemporaryWindow, .newNoTraceWindow, .openFile, .closeTab, .closeWindow, .closeAllWindows, .createQRCode, .share, .snapshotCurrentPagePortion, .snapshotFullPage, .savePageAs, .print]
+    static let allFileCommands: [KeyboardShortcuts.Name] = [.newTab, .openLocation, .newWindow, .newTemporaryWindow, .newNoTraceWindow, .openFile, .closeTab, .closeWindow, .closeAllWindows, .createQRCode, .share, .snapshotCurrentPagePortion, .snapshotFullPage, .savePageAs, .print]
 }

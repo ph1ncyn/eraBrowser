@@ -32,24 +32,6 @@ struct SearchSuggestion: Identifiable, Equatable {
         self.favicon = favicon
     }
     
-    /// The icon of the search suggestion
-    var searchIcon: some View {
-        Group {
-            if let favicon {
-                AsyncImage(url: favicon) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } placeholder: {
-                    Image(systemName: "globe")
-                }
-            } else {
-                Image(systemName: isURLValid ? "globe" : "magnifyingglass")
-            }
-        }
-        .frame(width: 15, height: 15)
-    }
-    
     // MARK: - Equatable
     static func == (lhs: SearchSuggestion, rhs: SearchSuggestion) -> Bool {
         lhs.id == rhs.id

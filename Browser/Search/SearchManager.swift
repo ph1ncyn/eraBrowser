@@ -123,6 +123,9 @@ class SearchManager {
     /// - Parameters: modelContext: The current `ModelContext`
     private func openInCurrentTab(_ searchSuggestion: SearchSuggestion, browserWindowState: BrowserWindowState, using modelContext: ModelContext) {
         if let currentTab = browserWindowState.currentSpace?.currentTab {
+            // Forget the saved page state, otherwise an unloaded tab would restore its old page instead
+            currentTab.restorationState = nil
+            currentTab.sessionState = nil
             currentTab.url = searchSuggestion.suggestedURL
             currentTab.webview?.load(URLRequest(url: searchSuggestion.suggestedURL))
             currentTab.updateFavicon(with: searchSuggestion.suggestedURL)
@@ -131,8 +134,9 @@ class SearchManager {
         }
     }
 
-    func searchAction(_ searchSuggestion: SearchSuggestion, browserWindowState: BrowserWindowState, using modelContext: ModelContext) {
-        if browserWindowState.searchOpenLocation == .fromNewTab {
+    /// - Parameter inNewTab: Force opening in a new tab (⌘↩); by default, a new tab is opened when searching from "New Tab"
+    func searchAction(_ searchSuggestion: SearchSuggestion, browserWindowState: BrowserWindowState, using modelContext: ModelContext, inNewTab: Bool? = nil) {
+        if inNewTab ?? (browserWindowState.searchOpenLocation == .fromNewTab) {
             openNewTab(searchSuggestion, browserWindowState: browserWindowState, using: modelContext)
         } else {
             openInCurrentTab(searchSuggestion, browserWindowState: browserWindowState, using: modelContext)
