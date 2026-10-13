@@ -54,8 +54,11 @@ struct WebViewStack: View {
         }
         .transaction { $0.animation = .bouncy(duration: 0.3) }
         .onAppear(perform: restoreLastSelectedTab)
-        .onChange(of: browserSpace.currentTab) { _, newValue in
+        .onChange(of: browserSpace.currentTab) { oldValue, newValue in
             browserSpace.lastSelectedTabID = newValue?.id
+            if browserWindowState.currentSpace == browserSpace {
+                WebExtensionsManager.shared.tabDidActivate(newValue, previous: oldValue, in: browserWindowState)
+            }
         }
     }
 

@@ -45,6 +45,9 @@ import SwiftData
     
     var showTabSwitcher = false
 
+    /// The window showing this state (set by `WindowAccessor`)
+    @ObservationIgnored weak var nsWindow: NSWindow?
+
     /// Split views of this window, by space id (see SplitView.swift)
     var splitGroups: [UUID: SplitGroup] = [:]
 

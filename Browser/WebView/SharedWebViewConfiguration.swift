@@ -21,6 +21,8 @@ class SharedWebViewConfiguration {
     private(set) lazy var noTraceConfiguration: WKWebViewConfiguration = {
         let noTraceConfiguration = configuration.copy() as! WKWebViewConfiguration
         noTraceConfiguration.websiteDataStore = .nonPersistent()
+        // Extensions don't run in No-Trace windows
+        noTraceConfiguration.webExtensionController = nil
         return noTraceConfiguration
     }()
 
@@ -57,6 +59,9 @@ class SharedWebViewConfiguration {
         configuration.defaultWebpagePreferences = webPagePreferences
 
         installUserScripts()
+
+        // Chrome / Firefox / Safari web extensions
+        configuration.webExtensionController = WebExtensionsManager.shared.controller
     }
 
     /// Installs the JavaScript listeners once for every web view.

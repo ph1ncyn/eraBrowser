@@ -102,6 +102,7 @@ extension WKWebViewControllerRepresentable {
         /// Observes the webview to update the tab's properties, such as the title, favicon, url, and navigation buttons...
         func observeWebView(_ webview: MyWKWebView) {
             self.parent.tab.webview = webview
+            WebExtensionsManager.shared.tabDidOpen(self.parent.tab, in: self.parent.browserWindowState)
                         
             webview.publisher(for: \.canGoBack)
                 .receive(on: DispatchQueue.main)
@@ -120,8 +121,9 @@ extension WKWebViewControllerRepresentable {
             webview.publisher(for: \.url)
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] url in
-                    guard let url else { return }
-                    self?.parent.tab.url = url
+                    guard let url, let tab = self?.parent.tab else { return }
+                    tab.url = url
+                    WebExtensionsManager.shared.tabDidChange(tab, properties: .URL)
                 }
                 .store(in: &cancellables)
             
@@ -132,6 +134,9 @@ extension WKWebViewControllerRepresentable {
                         self?.parent.tab.title = title
                     } else {
                         self?.parent.tab.title = self?.parent.tab.url.cleanHost ?? ""
+                    }
+                    if let tab = self?.parent.tab {
+                        WebExtensionsManager.shared.tabDidChange(tab, properties: .title)
                     }
                 }
                 .store(in: &cancellables)
@@ -146,6 +151,9 @@ extension WKWebViewControllerRepresentable {
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] isLoading in
                     self?.parent.tab.isLoading = isLoading
+                    if let tab = self?.parent.tab {
+                        WebExtensionsManager.shared.tabDidChange(tab, properties: .loading)
+                    }
                 }
                 .store(in: &cancellables)
         }

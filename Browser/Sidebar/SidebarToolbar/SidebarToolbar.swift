@@ -31,6 +31,8 @@ struct SidebarToolbar: View {
     
     var body: some View {
             HStack {
+                SidebarExtensionButtons()
+                
                 Button(action: { 
                     if let url = currentTab?.url {
                         StyleManager.shared.toggleStyles(for: url)

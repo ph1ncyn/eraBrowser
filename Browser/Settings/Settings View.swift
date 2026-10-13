@@ -18,6 +18,10 @@ struct SettingsView: View {
                 SettingsAppearanceView()
             }
             
+            Tab("Extensions", systemImage: "puzzlepiece.extension") {
+                SettingsExtensionsView()
+            }
+            
             Tab("Websites", systemImage: "hand.raised") {
                 SettingsWebsitesView()
             }

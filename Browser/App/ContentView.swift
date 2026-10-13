@@ -27,6 +27,22 @@ struct ContentView: View {
         mainFrameWithBackground
             .ignoresSafeArea(.all)
             .focusedSceneValue(\.browserActiveWindowState, browserWindowState)
+            .background(WindowAccessor { window in
+                browserWindowState.nsWindow = window
+                if window != nil {
+                    WebExtensionsManager.shared.windowDidOpen(browserWindowState)
+                }
+            })
+            .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
+                if let window = notification.object as? NSWindow, window === browserWindowState.nsWindow {
+                    WebExtensionsManager.shared.windowDidFocus(browserWindowState)
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSWindow.willCloseNotification)) { notification in
+                if let window = notification.object as? NSWindow, window === browserWindowState.nsWindow {
+                    WebExtensionsManager.shared.windowDidClose(browserWindowState)
+                }
+            }
             .environment(browserWindowState)
             .sheet(isPresented: $browserWindowState.showURLQRCode) {
                 if let currentTab = browserWindowState.currentSpace?.currentTab {

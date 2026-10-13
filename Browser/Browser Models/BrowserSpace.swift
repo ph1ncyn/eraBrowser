@@ -193,6 +193,7 @@ final class BrowserSpace: Identifiable {
     /// tab, so reopening it brings back the page with its back/forward history.
     private func markClosed(_ tab: BrowserTab) {
         unloadTab(tab)
+        WebExtensionsManager.shared.tabDidClose(tab)
         tab.isClosed = true
         tab.closedAt = .now
     }

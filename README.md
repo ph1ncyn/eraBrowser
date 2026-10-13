@@ -44,7 +44,23 @@ https://github.com/user-attachments/assets/90738982-651a-4991-8580-866325d1d128
 - [x] Multiple Windows
 - [x] Reopen Closed Tabs (⌘⇧T, History → Recently Closed) with their back/forward history
 - [x] **eraAI** side panel (⌘⇧E): chat about the current page, summarize, explain selected text (right click → Ask eraAI)
-- [ ] Grid Layout
+- [x] **Split View**: up to 4 tabs side by side, stacked or in a grid (⌘\\, right click a tab → Open in Split View)
+- [x] **Extensions** from the Chrome Web Store and Firefox Add-ons (see below)
+- [x] Session restore: tabs, selected tab and back/forward history come back after a relaunch; closing the last tab keeps the window open
+- [x] Per-site camera / microphone / location permissions (address bar → slider icon, Settings → Websites)
+- [x] Choice of search engine: Google, DuckDuckGo, Bing, Brave, Yandex, Ecosia, Startpage, Kagi, Perplexity or custom
+
+## Extensions
+
+era loads WebExtensions with WebKit's `WKWebExtension` (the engine behind Safari extensions, macOS 15.4+).
+Chrome (Manifest V2/V3) and Firefox extensions use the same WebExtensions format, so most of them work as is:
+
+- open an extension's page on **chromewebstore.google.com** or **addons.mozilla.org** and press **+** in the sidebar, or
+- paste the store link in **Settings → Extensions**, or install a `.crx` / `.xpi` / `.zip` file or an unpacked folder.
+
+Extension buttons appear in the sidebar toolbar (right click → Extension Settings). Extensions don't run in No-Trace windows.
+APIs WebKit doesn't implement are unavailable — notably blocking `webRequest` (use uBlock Origin Lite instead of uBlock Origin),
+`chrome.debugger` and other Chrome-only APIs. Orion goes further by implementing such APIs itself.
 
 ## eraAI
 
