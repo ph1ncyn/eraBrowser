@@ -18,6 +18,10 @@ struct SettingsView: View {
                 SettingsAppearanceView()
             }
             
+            Tab("Websites", systemImage: "hand.raised") {
+                SettingsWebsitesView()
+            }
+            
             Tab("eraAI", systemImage: "sparkles") {
                 SettingsEraAIView()
             }

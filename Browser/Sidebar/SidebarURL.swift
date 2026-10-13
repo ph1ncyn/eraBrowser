@@ -14,6 +14,7 @@ struct SidebarURL: View {
     @EnvironmentObject var userPreferences: UserPreferences
     
     @State var hover = false
+    @State var showSiteSettings = false
     
     var body: some View {
         HStack {
@@ -23,7 +24,18 @@ struct SidebarURL: View {
 
                 Spacer()
                 
-                if hover {
+                if hover || showSiteSettings {
+                    if let host = currentTab.url.host(), !host.isEmpty {
+                        Button("Site Settings", systemImage: "slider.horizontal.3") {
+                            showSiteSettings.toggle()
+                        }
+                        .buttonStyle(.sidebarHover(hoverStyle: AnyShapeStyle(.ultraThinMaterial) ,cornerRadius: 7))
+                        .popover(isPresented: $showSiteSettings, arrowEdge: .bottom) {
+                            SiteSettingsPopover(host: host)
+                        }
+                        .browserTransition(.opacity)
+                    }
+                    
                     Button("Copy URL To Clipboard", systemImage: "link", action: browserWindowState.copyURLToClipboard)
                         .buttonStyle(.sidebarHover(hoverStyle: AnyShapeStyle(.ultraThinMaterial) ,cornerRadius: 7))
                         .padding(.trailing, .sidebarPadding)

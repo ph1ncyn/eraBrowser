@@ -91,4 +91,40 @@ extension WKWebViewController: WKUIDelegate {
             }
         }
     }
+    
+    // MARK: - Site permissions
+    
+    /// Camera / microphone requests, resolved with the per-site decisions (Settings → Websites)
+    func webView(_ webView: WKWebView, requestMediaCapturePermissionFor origin: WKSecurityOrigin, initiatedByFrame frame: WKFrameInfo, type: WKMediaCaptureType, decisionHandler: @escaping @MainActor (WKPermissionDecision) -> Void) {
+        let permissions: [SitePermission]
+        switch type {
+        case .camera:
+            permissions = [.camera]
+        case .microphone:
+            permissions = [.microphone]
+        case .cameraAndMicrophone:
+            permissions = [.camera, .microphone]
+        @unknown default:
+            permissions = [.camera, .microphone]
+        }
+        SitePermissionStore.shared.request(permissions, host: origin.host, in: webView.window) { granted in
+            decisionHandler(granted ? .grant : .deny)
+        }
+    }
+    
+    /// Geolocation requests. WebKit only asks this through its private UI delegate
+    /// (`WKUIDelegatePrivate`); if it doesn't, WebKit's default behavior applies.
+    @objc(_webView:requestGeolocationPermissionForOrigin:initiatedByFrame:decisionHandler:)
+    func _webView(_ webView: WKWebView, requestGeolocationPermissionFor origin: WKSecurityOrigin, initiatedBy frame: WKFrameInfo, decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        SitePermissionStore.shared.request([.location], host: origin.host, in: webView.window) { granted in
+            decisionHandler(granted ? .grant : .deny)
+        }
+    }
+    
+    /// Older variant of the private geolocation request
+    @objc(_webView:requestGeolocationPermissionForFrame:decisionHandler:)
+    func _webView(_ webView: WKWebView, requestGeolocationPermissionFor frame: WKFrameInfo, decisionHandler: @escaping (Bool) -> Void) {
+        let host = frame.securityOrigin.host
+        SitePermissionStore.shared.request([.location], host: host, in: webView.window, completion: decisionHandler)
+    }
 }
