@@ -42,8 +42,8 @@ struct SearchTextField: View {
             Spacer()
             
             Group {
-                if !searchManager.isUsingWebsiteSearcher && searchManager.matchedWebsiteSearcher != .google {
-                    Text("Search with \(searchManager.matchedWebsiteSearcher.title)")
+                if !searchManager.isUsingWebsiteSearcher, let matchedWebsiteSearcher = searchManager.matchedWebsiteSearcher {
+                    Text("Search with \(matchedWebsiteSearcher.title)")
                     
                     Text("Tab")
                         .padding(5)

@@ -32,10 +32,10 @@ extension WKWebViewControllerRepresentable {
             self.parent.browserWindowState.presentActionAlert(message: message, systemImage: systemImage)
         }
         
-        /// Starts a Google search with the query in a new tab
+        /// Searches the query with the default search engine in a new tab
         func searchWebAction(_ query: String) {
             let insertionOrder = calculateInsertionOrder()
-            let newTab = BrowserTab(title: query, url: URL(string: "https://www.google.com/search?q=\(query)")!, order: insertionOrder, browserSpace: self.parent.browserSpace)
+            let newTab = BrowserTab(title: query, url: DefaultSearchEngine.current.searchURL(for: query), order: insertionOrder, browserSpace: self.parent.browserSpace)
             self.parent.browserSpace.openNewTab(newTab, using: self.parent.modelContext)
         }
         

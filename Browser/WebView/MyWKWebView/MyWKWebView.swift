@@ -14,7 +14,7 @@ class MyWKWebView: WKWebView {
     var scaledZoomFactor: CGFloat? = nil
     private var isPageEditable: Bool = false
 
-    /// The "Search With Google" action (passed from the WKWebViewController)
+    /// The "Search With <default search engine>" action (passed from the WKWebViewController)
     var searchWebAction: ((String) -> Void)? = nil
     /// The "Open Link In New Tab" action (passed from the WKWebViewController)
     var openLinkInNewTabAction: ((URL) -> Void)? = nil

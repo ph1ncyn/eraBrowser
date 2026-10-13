@@ -26,11 +26,13 @@ class SearchManager {
         }
     }
 
-    var matchedWebsiteSearcher: SearchEngine {
-        SearchEngine.allCases.first(where: { $0.title.lowercased().hasPrefix(searchText.lowercased()) }) ?? .google
+    /// Website searcher matching the typed text (press Tab to search directly on that website)
+    var matchedWebsiteSearcher: SearchEngine? {
+        guard !searchText.isEmpty else { return nil }
+        return SearchEngine.allCases.first(where: { $0.title.lowercased().hasPrefix(searchText.lowercased()) })
     }
     var isUsingWebsiteSearcher: Bool = false
-    var activeWebsiteSearcher = SearchEngine.google.searcher
+    var activeWebsiteSearcher = DefaultSearchEngine.current.searcher
 
     var searchTask: URLSessionDataTask?
 
@@ -82,7 +84,7 @@ class SearchManager {
         withAnimation(.browserDefault) {
             if isUsingWebsiteSearcher {
                 resetWebsiteSearcher()
-            } else if matchedWebsiteSearcher != .google {
+            } else if let matchedWebsiteSearcher {
                 isUsingWebsiteSearcher = true
                 activeWebsiteSearcher = matchedWebsiteSearcher.searcher
                 searchText = ""
@@ -144,6 +146,6 @@ class SearchManager {
 
     func resetWebsiteSearcher() {
         isUsingWebsiteSearcher = false
-        activeWebsiteSearcher = SearchEngine.google.searcher
+        activeWebsiteSearcher = DefaultSearchEngine.current.searcher
     }
 }

@@ -17,6 +17,8 @@ struct GeneralSettingsView: View {
             Toggle("Automatic Page Suspension", systemImage: "hand.raised.fill", isOn: $userPreferences.automaticPageSuspension)
             Toggle("Show Hover URL", systemImage: "dot.circle.and.cursorarrow", isOn: $userPreferences.showHoverURL)
             
+            SearchEngineSection()
+            
             DownloadFolderSection()
             
             CustomWebsiteSearchersSection()
