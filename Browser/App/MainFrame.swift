@@ -111,19 +111,28 @@ struct MainFrame: View {
     // MARK: - Detail (WebView)
     @ViewBuilder
     private var pageView: some View {
-        HStack(spacing: 6) {
-            PageWebView(browserSpaces: browserSpaces)
-                .clipShape(.rect(cornerRadius: cornerRadius))
-                .shadow(radius: shadowRadius)
+        VStack(spacing: 4) {
+            if userPreferences.addressBarPosition == .abovePage && !isImmersive {
+                PageToolbar()
+                    .padding(.top, 6)
+                    .browserTransition(.move(edge: .top).combined(with: .opacity))
+            }
 
-            if browserWindowState.showEraAI {
-                EraAIPanel(chat: browserWindowState.eraAI)
-                    .frame(width: 340)
+            HStack(spacing: 6) {
+                PageWebView(browserSpaces: browserSpaces)
+                    .clipShape(.rect(cornerRadius: cornerRadius))
                     .shadow(radius: shadowRadius)
-                    .padding([.top, .bottom, .trailing], 6)
-                    .browserTransition(.move(edge: .trailing).combined(with: .opacity))
+
+                if browserWindowState.showEraAI {
+                    EraAIPanel(chat: browserWindowState.eraAI)
+                        .frame(width: 340)
+                        .shadow(radius: shadowRadius)
+                        .padding([.top, .bottom, .trailing], 6)
+                        .browserTransition(.move(edge: .trailing).combined(with: .opacity))
+                }
             }
         }
+        .animation(.browserDefault, value: userPreferences.addressBarPosition)
         .ignoresSafeArea(edges: userPreferences.extendedSidebarStyle ? .all : [.top, .bottom, .trailing])
         .animation(.easeInOut(duration: 0.3), value: userPreferences.extendedSidebarStyle)
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.willEnterFullScreenNotification)) { _ in
@@ -153,10 +162,14 @@ struct MainFrame: View {
 struct ConditionalToolbarRemover: ViewModifier {
     let shouldRemove: Bool
     @Environment(BrowserWindowState.self) var browserWindowState
+    @EnvironmentObject var userPreferences: UserPreferences
 
     func body(content: Content) -> some View {
         if shouldRemove {
             content.toolbar(removing: .sidebarToggle)
+        } else if userPreferences.addressBarPosition == .abovePage {
+            // Back / forward are in the toolbar above the page; keep only the sidebar toggle here
+            content
         } else {
             content.toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {

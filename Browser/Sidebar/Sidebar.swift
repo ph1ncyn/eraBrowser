@@ -21,14 +21,25 @@ struct Sidebar: View {
     
     var body: some View {
         VStack {
-            HStack(spacing: 6){
-                SidebarURL()
-                SidebarToolbar(browserSpaces: browserSpaces)
+            switch userPreferences.addressBarPosition {
+            case .sidebarTop:
+                addressRow
+                    .padding(.top, 12)
+            case .sidebarBottom, .abovePage:
+                Color.clear
+                    .frame(height: 6)
             }
-            .padding(.top, 12)
+            
             SidebarSpacesTabView(browserSpaces: browserSpaces)
+            
+            if userPreferences.addressBarPosition == .sidebarBottom {
+                addressRow
+                    .padding(.bottom, 2)
+            }
+            
             SidebarBottomToolbar(browserSpaces: browserSpaces, createSpace: createSpace)
         }
+        .animation(.browserDefault, value: userPreferences.addressBarPosition)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .opacity(sidebarModel.currentSidebarWidth == 0 ? 0 : 1)
         .gesture(WindowDragGesture()) // Move the browser window by dragging the sidebar
@@ -60,6 +71,14 @@ struct Sidebar: View {
                     .padding(.leading, .sidebarPadding)
                     .padding(.bottom, 44)
             }
+        }
+    }
+    
+    /// Address bar with the extension buttons
+    private var addressRow: some View {
+        HStack(spacing: 6) {
+            SidebarURL()
+            SidebarToolbar(browserSpaces: browserSpaces)
         }
     }
     

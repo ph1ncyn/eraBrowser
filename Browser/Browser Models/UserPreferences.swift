@@ -27,6 +27,17 @@ class UserPreferences: ObservableObject {
     }
     @AppStorage("loading_indicator_position") var loadingIndicatorPosition = LoadingIndicatorPosition.onURL
     
+    /// Where the address bar (and the extension buttons) are shown
+    enum AddressBarPosition: String {
+        /// Top of the sidebar, under the window buttons
+        case sidebarTop
+        /// Bottom of the sidebar, above the spaces bar
+        case sidebarBottom
+        /// A toolbar above the page with back / forward and the address bar, visible even when the sidebar is hidden
+        case abovePage
+    }
+    @AppStorage("address_bar_position") var addressBarPosition = AddressBarPosition.sidebarTop
+    
     // Web appearance preferences
     @AppStorage("rounded_corners") var roundedCorners = true
     @AppStorage("web_content_transparency") var webContentTransparency = false
@@ -83,6 +94,7 @@ class UserPreferences: ObservableObject {
             "clear_selected_tab": false,
             "open_pip_on_tab_change": true,
             "loading_indicator_position": LoadingIndicatorPosition.onURL.rawValue,
+            "address_bar_position": AddressBarPosition.sidebarTop.rawValue,
             "automatic_page_suspension": true,
             "show_hover_url": true,
             "web_content_transparency": false,
